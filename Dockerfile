@@ -90,7 +90,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Install Android SDK
-RUN wget -quiet https://dl.google.com/android/repository/tools_r25.2.5-linux.zip \
+RUN wget https://dl.google.com/android/repository/tools_r25.2.5-linux.zip \
   && unzip tools_r25.2.5-linux.zip \
   && mkdir -p /usr/local/android-sdk \
   && mv tools /usr/local/android-sdk/ \
