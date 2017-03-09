@@ -14,7 +14,7 @@ ENV DOCKER_ANDROID_DISPLAY_NAME mobileci-docker
 # Never ask for confirmations
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV ANDROID_COMPONENTS platform-tools,android-25,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,build-tools-25.0.2
+ENV ANDROID_COMPONENTS platform-tools,android-25,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,build-tools-25.0.2,build-tools-24.0.3
 # Environment variables
 ENV ANDROID_HOME /usr/local/android-sdk
 ENV ANDROID_SDK_HOME $ANDROID_HOME
@@ -22,7 +22,8 @@ ENV PATH ${INFER_HOME}/bin:${PATH}
 ENV PATH $PATH:$ANDROID_SDK_HOME/tools
 ENV PATH $PATH:$ANDROID_SDK_HOME/platform-tools
 ENV PATH $PATH:$ANDROID_SDK_HOME/build-tools/25.0.2
-
+ENV PATH $PATH:$ANDROID_SDK_HOME/build-tools/24.0.3
+ENV PATH $PATH:/opt/gradle/gradle-3.4.1/bin
 
 # Export JAVA_HOME variable
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
@@ -89,8 +90,15 @@ RUN apt-get update \
   && apt-get clean \ 
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Install Gradle
+RUN mkdir /opt/gradle \
+  && cd /opt/gradle \
+  && wget -quiet "https://services.gradle.org/distributions/gradle-3.4.1-bin.zip" \
+  && unzip gradle-3.4.1-bin.zip \
+  && rm gradle-3.4.1-bin.zip
+
 # Install Android SDK
-RUN wget https://dl.google.com/android/repository/tools_r25.2.5-linux.zip \
+RUN wget -quiet https://dl.google.com/android/repository/tools_r25.2.5-linux.zip \
   && unzip tools_r25.2.5-linux.zip \
   && mkdir -p /usr/local/android-sdk \
   && mv tools /usr/local/android-sdk/ \
@@ -109,6 +117,10 @@ ENV PROJECT /project
 RUN mkdir $PROJECT
 RUN chown -R $RUN_USER:$RUN_USER $PROJECT
 WORKDIR $PROJECT
+
+RUN chown -R $RUN_USER:$RUN_USER $PROJECT \
+ && touch /usr/local/android-sdk/.android/repositories.cfg \
+ && chown $RUN_USER:$RUN_USER /usr/local/android-sdk/.android/repositories.cfg
 
 USER $RUN_USER
 RUN echo "sdk.dir=$ANDROID_HOME" > local.properties
