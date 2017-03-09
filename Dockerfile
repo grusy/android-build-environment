@@ -23,7 +23,6 @@ ENV PATH $PATH:$ANDROID_SDK_HOME/tools
 ENV PATH $PATH:$ANDROID_SDK_HOME/platform-tools
 ENV PATH $PATH:$ANDROID_SDK_HOME/build-tools/25.0.2
 ENV PATH $PATH:$ANDROID_SDK_HOME/build-tools/24.0.3
-ENV PATH $PATH:/opt/gradle/gradle-3.4.1/bin
 
 # Export JAVA_HOME variable
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
@@ -89,13 +88,6 @@ RUN apt-get update \
   # Clean Up Apt-get
   && apt-get clean \ 
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# Install Gradle
-RUN mkdir /opt/gradle \
-  && cd /opt/gradle \
-  && wget -quiet "https://services.gradle.org/distributions/gradle-3.4.1-bin.zip" \
-  && unzip gradle-3.4.1-bin.zip \
-  && rm gradle-3.4.1-bin.zip
 
 # Install Android SDK
 RUN wget -quiet https://dl.google.com/android/repository/tools_r25.2.5-linux.zip \
