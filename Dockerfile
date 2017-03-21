@@ -32,16 +32,6 @@ ENV TERM dumb
 ENV JAVA_OPTS "-Xms4096m -Xmx4096m"
 ENV GRADLE_OPTS "-XX:+UseG1GC -XX:MaxGCPauseMillis=1000"
 
-# Add build user account, values are set to default below
-ENV RUN_USER mobileci
-ENV RUN_UID 5089
-
-RUN id $RUN_USER || adduser --uid "$RUN_UID" \
-    --gecos 'Build User' \
-    --shell '/bin/sh' \
-    --disabled-login \
-    --disabled-password "$RUN_USER"
-
 # Update apt-get
 RUN apt-get update \
   && apt-get dist-upgrade -y \
@@ -99,9 +89,6 @@ RUN wget https://dl.google.com/android/repository/tools_r25.2.5-linux.zip \
 # Install Android tools
   && echo y | /usr/local/android-sdk/tools/android update sdk --filter "${ANDROID_COMPONENTS}" --no-ui -a \
 
-# Fix permissions 
-  && chown -R $RUN_USER:$RUN_USER $ANDROID_HOME $ANDROID_SDK_HOME \
-  && chmod -R a+rx $ANDROID_HOME $ANDROID_SDK_HOME 
 
 # Creating project directories prepared for build when running
 # `docker run`
@@ -110,9 +97,5 @@ RUN mkdir $PROJECT
 RUN chown -R $RUN_USER:$RUN_USER $PROJECT
 WORKDIR $PROJECT
 
-RUN chown -R $RUN_USER:$RUN_USER $PROJECT \
- && touch /usr/local/android-sdk/.android/repositories.cfg \
- && chown $RUN_USER:$RUN_USER /usr/local/android-sdk/.android/repositories.cfg
-
-USER $RUN_USER
+RUN touch /usr/local/android-sdk/.android/repositories.cfg 
 RUN echo "sdk.dir=$ANDROID_HOME" > local.properties
